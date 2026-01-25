@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { studentsApi } from '../../api/students.api';
 import { groupsApi } from '../../api/groups.api';
+import { formatDate } from '../../api/helpers';
 import { FiSearch, FiPlus, FiEdit2, FiTrash2, FiEye, FiCheck } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -20,7 +21,8 @@ const Students = () => {
     lastName: '',
     phoneNumber: '',
     parentPhoneNumber: '',
-    groupIds: []
+    groupIds: [],
+    paymentDayOfMonth: ''
   });
 
   const { data: students = [], isLoading: loading } = useQuery({
@@ -63,7 +65,8 @@ const Students = () => {
         lastName: student.lastName,
         phoneNumber: student.phoneNumber || '',
         parentPhoneNumber: student.parentPhoneNumber || '',
-        groupIds: student.groups ? student.groups.map(g => g.id) : []
+        groupIds: student.groups ? student.groups.map(g => g.id) : [],
+        paymentDayOfMonth: student.paymentDayOfMonth || ''
       });
     } else {
       setEditingStudent(null);
@@ -72,7 +75,8 @@ const Students = () => {
         lastName: '',
         phoneNumber: '',
         parentPhoneNumber: '',
-        groupIds: []
+        groupIds: [],
+        paymentDayOfMonth: ''
       });
     }
     setIsModalOpen(true);
@@ -214,6 +218,9 @@ const Students = () => {
                   Guruh
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Keyingi to'lov
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -244,6 +251,9 @@ const Students = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {student.groups && student.groups.length > 0 ? student.groups.map(g => g.name).join(', ') : 'Guruhsiz'}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {formatDate(student.nextDueDate)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
@@ -340,6 +350,19 @@ const Students = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
               value={formData.parentPhoneNumber}
               onChange={(e) => setFormData({ ...formData, parentPhoneNumber: formatPhoneNumber(e.target.value) })}
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">To'lov kuni (oyning sanasi)</label>
+            <input
+              type="number"
+              min="1"
+              max="31"
+              placeholder="Masalan: 5"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              value={formData.paymentDayOfMonth}
+              onChange={(e) => setFormData({ ...formData, paymentDayOfMonth: e.target.value })}
             />
           </div>
 

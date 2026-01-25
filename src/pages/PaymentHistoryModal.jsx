@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { paymentsApi } from '../api/payments.api';
-import { formatCurrency } from '../api/helpers';
+import { formatCurrency, formatDate } from '../api/helpers';
 import Modal from '../components/common/Modal';
 import { FiTrash2, FiEdit2, FiSave, FiX, FiCreditCard, FiDollarSign } from 'react-icons/fi';
 import toast from 'react-hot-toast';
@@ -108,6 +108,7 @@ const PaymentHistoryModal = ({ isOpen, onClose, studentId, studentName, onRefres
               <thead>
                 <tr className="bg-gray-50 border-b">
                   <th className="px-4 py-2 text-xs font-semibold text-gray-500">Sana</th>
+                  <th className="px-4 py-2 text-xs font-semibold text-gray-500">To'lov muddati</th>
                   <th className="px-4 py-2 text-xs font-semibold text-gray-500">Summa</th>
                   <th className="px-4 py-2 text-xs font-semibold text-gray-500">Turi</th>
                   <th className="px-4 py-2 text-xs font-semibold text-gray-500">Izoh</th>
@@ -121,6 +122,9 @@ const PaymentHistoryModal = ({ isOpen, onClose, studentId, studentName, onRefres
                     <tr key={payment.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 text-sm text-gray-900">
                         {new Date(payment.createdAt || payment.date).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {formatDate(payment.dueDate)}
                       </td>
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">
                         {editingId === payment.id ? (

@@ -15,7 +15,7 @@ import {
 
 import { studentsApi } from "../../api/students.api";
 import { paymentsApi } from "../../api/payments.api";
-import { formatCurrency } from "../../api/helpers";
+import { formatCurrency, formatDate } from "../../api/helpers";
 
 const StudentDetails = () => {
   const { id } = useParams();
@@ -176,6 +176,18 @@ const StudentDetails = () => {
                 {new Date(student.createdAt).toLocaleDateString()}
               </span>
             </div>
+            <div className="flex gap-2 items-center">
+              <FiCalendar />
+              <span>
+                To'lov kuni: {student.paymentDayOfMonth || "-"}
+              </span>
+            </div>
+            <div className="flex gap-2 items-center">
+              <FiCalendar />
+              <span>
+                Keyingi to'lov: {formatDate(student.nextDueDate)}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -214,6 +226,7 @@ const StudentDetails = () => {
                 <thead className="bg-gray-50 border-b">
                   <tr>
                     <th className="px-3 py-2 text-left">Sana</th>
+                    <th className="px-3 py-2 text-left">To'lov muddati</th>
                     <th className="px-3 py-2 text-left">Summa</th>
                     <th className="px-3 py-2 text-left">Turi</th>
                     <th className="px-3 py-2 text-right">Amallar</th>
@@ -227,6 +240,10 @@ const StudentDetails = () => {
                       <tr key={p.id} className="border-b hover:bg-gray-50">
                         <td className="px-3 py-2">
                           {new Date(p.createdAt || p.date).toLocaleDateString()}
+                        </td>
+
+                        <td className="px-3 py-2">
+                          {formatDate(p.dueDate)}
                         </td>
 
                         <td className="px-3 py-2 font-medium">

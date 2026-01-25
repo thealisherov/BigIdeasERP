@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { paymentsApi } from '../api/payments.api';
 import { studentsApi } from '../api/students.api';
-import { getUserBranchId, formatCurrency } from '../api/helpers';
+import { getUserBranchId, formatCurrency, formatDate } from '../api/helpers';
 import { FiPlus, FiSearch, FiCreditCard, FiDollarSign, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import Modal from '../components/common/Modal';
 import PaymentHistoryModal from './PaymentHistoryModal';
@@ -185,6 +185,8 @@ const Payments = () => {
                  <option value="PAID">To'liq to'lagan</option>
                  <option value="PARTIAL">Qisman to'lagan</option>
                  <option value="UNPAID">To'lamagan</option>
+                 <option value="UPCOMING">Kutilmoqda</option>
+                 <option value="OVERDUE">Muddati o'tgan</option>
              </select>
         </div>
       </div>
@@ -197,6 +199,7 @@ const Payments = () => {
                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">O'quvchi</th>
                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Telefon</th>
                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Guruhlar</th>
+                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">To'lov muddati</th>
                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">To'lagan</th>
                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Qarzdorlik</th>
                 <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
@@ -224,6 +227,9 @@ const Payments = () => {
                      <td className="px-6 py-4 text-sm text-gray-500">
                       {student.groupName || (student.groups?.map(g => g.name).join(', ') || '-')}
                     </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {formatDate(student.nextDueDate)}
+                    </td>
                     <td className="px-6 py-4 text-sm font-bold text-green-600">
                       {formatCurrency(student.totalPaidInMonth || 0)}
                     </td>
@@ -231,9 +237,15 @@ const Payments = () => {
                       {formatCurrency(student.remainingAmount)}
                     </td>
                     <td className="px-6 py-4 text-sm">
-                       {(student.paymentStatus === 'PAID' || student.remainingAmount === 0) && <span className="text-green-600 bg-green-100 px-2 py-1 rounded text-xs">To'liq</span>}
+                       {student.paymentStatus === 'PAID' && <span className="text-green-600 bg-green-100 px-2 py-1 rounded text-xs">To'liq</span>}
                        {student.paymentStatus === 'PARTIAL' && <span className="text-yellow-600 bg-yellow-100 px-2 py-1 rounded text-xs">Qisman</span>}
-                       {(student.paymentStatus === 'UNPAID' || (!student.paymentStatus && student.remainingAmount > 0)) && <span className="text-red-600 bg-red-100 px-2 py-1 rounded text-xs">To'lamagan</span>}
+                       {student.paymentStatus === 'UNPAID' && <span className="text-red-600 bg-red-100 px-2 py-1 rounded text-xs">To'lamagan</span>}
+                       {student.paymentStatus === 'UPCOMING' && <span className="text-blue-600 bg-blue-100 px-2 py-1 rounded text-xs">Kutilmoqda</span>}
+                       {student.paymentStatus === 'OVERDUE' && <span className="text-red-800 bg-red-200 px-2 py-1 rounded text-xs">Muddati o'tgan</span>}
+
+                       {/* Fallback */}
+                       {!student.paymentStatus && student.remainingAmount > 0 && <span className="text-red-600 bg-red-100 px-2 py-1 rounded text-xs">To'lamagan</span>}
+                       {!student.paymentStatus && student.remainingAmount === 0 && <span className="text-green-600 bg-green-100 px-2 py-1 rounded text-xs">To'liq</span>}
                     </td>
                      <td className="px-6 py-4 text-sm">
                        <div className="flex gap-2">
