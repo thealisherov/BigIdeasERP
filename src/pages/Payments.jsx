@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { paymentsApi } from '../api/payments.api';
 import { studentsApi } from '../api/students.api';
 import { getUserBranchId, formatCurrency, formatDate } from '../api/helpers';
-import { FiPlus, FiSearch, FiCreditCard, FiDollarSign, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiCreditCard, FiDollarSign, FiEdit2, FiTrash2, FiCalendar } from 'react-icons/fi';
 import Modal from '../components/common/Modal';
 import PaymentHistoryModal from './PaymentHistoryModal';
 
@@ -17,6 +17,8 @@ const Payments = () => {
   // Search and Filter State
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   const [formData, setFormData] = useState({
     studentId: '',
@@ -39,14 +41,11 @@ const Payments = () => {
       const month = new Date().getMonth() + 1;
 
       try {
-        // Backenddagi /unpaid endpointiga so'rov yuborish
-        const response = await paymentsApi.getUnpaidStudents({ branchId, year, month });
+        const response = await studentsApi.getAll({ branchId, year, month });
         return response.data;
       } catch (error) {
-        console.warn("To'lov ma'lumotlarini olishda xatolik, studentlar ro'yxati yuklanmoqda:", error);
-        // Fallback: Agar /unpaid ishlamasa, oddiy studentlar ro'yxatini olamiz
-        const response = await studentsApi.getAll({ branchId });
-        return response.data;
+        console.error("Error fetching students:", error);
+        return [];
       }
     },
   });
@@ -146,7 +145,18 @@ const Payments = () => {
           matchesStatus = student.paymentStatus === statusFilter;
       }
 
-      return matchesSearch && matchesStatus;
+      let matchesDate = true;
+      if (startDate || endDate) {
+          const dueDate = student.nextDueDate;
+          if (!dueDate) {
+              matchesDate = false;
+          } else {
+              if (startDate && dueDate < startDate) matchesDate = false;
+              if (endDate && dueDate > endDate) matchesDate = false;
+          }
+      }
+
+      return matchesSearch && matchesStatus && matchesDate;
   });
 
   return (
@@ -188,6 +198,33 @@ const Payments = () => {
                  <option value="UPCOMING">Kutilmoqda</option>
                  <option value="OVERDUE">Muddati o'tgan</option>
              </select>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-4 items-center bg-gray-50 p-3 rounded-lg border border-gray-200">
+             <span className="text-gray-600 font-medium flex items-center gap-2">
+                <FiCalendar /> Muddat:
+             </span>
+             <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+             />
+             <span className="text-gray-400">-</span>
+             <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+             />
+             {(startDate || endDate) && (
+                <button
+                    onClick={() => { setStartDate(''); setEndDate(''); }}
+                    className="text-sm text-red-600 hover:text-red-800"
+                >
+                    Tozalash
+                </button>
+             )}
         </div>
       </div>
 
