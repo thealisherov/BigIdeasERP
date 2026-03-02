@@ -1,0 +1,13 @@
+[build]
+  # Loyihani qurish (build) buyrug'i
+  command = "npm run build"
+
+  # Netlify yuklaydigan papka (build natijasi)
+  publish = "dist"
+
+# SPA (Single Page Application) uchun redirect
+# React Router yoki Vue Router ishlashi uchun bu SHART
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
