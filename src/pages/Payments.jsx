@@ -37,7 +37,8 @@ const Payments = () => {
     groupId: '',
     amount: '',
     description: '',
-    paymentDate: getDefaultPaymentDate()
+    paymentDate: getDefaultPaymentDate(),
+    paymentDueDate: ''
   });
   
   const [paymentMethod, setPaymentMethod] = useState('CASH');
@@ -85,14 +86,27 @@ const Payments = () => {
   });
 
   const handleOpenModal = (student = null) => {
+    let initialDueDate = '';
+    const pDate = getDefaultPaymentDate();
+    
     if (student) {
+      const paymentDay = student?.paymentDayOfMonth || 1;
+      if (pDate) {
+        const [year, month] = pDate.split('-');
+        const lastDayObj = new Date(year, month, 0);
+        const lastDay = lastDayObj.getDate();
+        const validDay = Math.min(paymentDay, lastDay);
+        initialDueDate = `${year}-${month}-${String(validDay).padStart(2, '0')}`;
+      }
+      
       setEditingPayment(null);
       setFormData({
         studentId: student.id,
         groupId: '',
         amount: student.remainingAmount || '',
         description: '',
-        paymentDate: getDefaultPaymentDate()
+        paymentDate: pDate,
+        paymentDueDate: initialDueDate
       });
       setPaymentMethod('CASH');
       handleStudentChange(student.id);
@@ -103,7 +117,8 @@ const Payments = () => {
         groupId: '',
         amount: '',
         description: '',
-        paymentDate: getDefaultPaymentDate()
+        paymentDate: pDate,
+        paymentDueDate: ''
       });
       setPaymentMethod('CASH');
       setStudentGroups([]);
@@ -125,6 +140,7 @@ const Payments = () => {
             amount: parseFloat(formData.amount),
             description: formData.description || '',
             paymentDate: formData.paymentDate,
+            paymentDueDate: formData.paymentDueDate,
             category: paymentMethod,
             branchId: getUserBranchId() ? Number(getUserBranchId()) : null
         };
@@ -410,7 +426,21 @@ const Payments = () => {
               disabled={!!formData.studentId && payments.some(p => p.id === formData.studentId)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all disabled:bg-gray-100"
               value={formData.studentId}
-              onChange={(e) => handleStudentChange(e.target.value)}
+              onChange={(e) => {
+                 const sId = e.target.value;
+                 handleStudentChange(sId);
+                 if (sId && formData.paymentDate) {
+                    const student = payments.find(s => s.id === Number(sId));
+                    if (student) {
+                      const paymentDay = student.paymentDayOfMonth || 1;
+                      const [year, month] = formData.paymentDate.split('-');
+                      const lastDayObj = new Date(year, month, 0);
+                      const validDay = Math.min(paymentDay, lastDayObj.getDate());
+                      const calcDueDate = `${year}-${month}-${String(validDay).padStart(2, '0')}`;
+                      setFormData(prev => ({...prev, paymentDueDate: calcDueDate}));
+                    }
+                 }
+              }}
             >
               <option value="">Tanlang</option>
               {payments.map(student => (
@@ -480,18 +510,45 @@ const Payments = () => {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">To'lov davri (oy)</label>
-            <input
-              type="month"
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              value={formData.paymentDate ? formData.paymentDate.substring(0, 7) : ''}
-              onChange={(e) => {
-                const val = e.target.value; // "YYYY-MM"
-                setFormData({ ...formData, paymentDate: val ? `${val}-01` : '' });
-              }}
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Boshlanish sanasi</label>
+                <input
+                  type="date"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  value={formData.paymentDate}
+                  onChange={(e) => {
+                    const newPaymentDate = e.target.value;
+                    
+                    setFormData(prev => {
+                      let newDueDate = prev.paymentDueDate;
+                      if (newPaymentDate && prev.studentId) {
+                        const student = payments.find(s => s.id === Number(prev.studentId));
+                        if (student) {
+                          const paymentDay = student.paymentDayOfMonth || 1;
+                          const [year, month] = newPaymentDate.split('-');
+                          const lastDayObj = new Date(year, month, 0);
+                          const validDay = Math.min(paymentDay, lastDayObj.getDate());
+                          newDueDate = `${year}-${month}-${String(validDay).padStart(2, '0')}`;
+                        }
+                      }
+                      return { ...prev, paymentDate: newPaymentDate, paymentDueDate: newDueDate };
+                    });
+                  }}
+                />
+             </div>
+
+             <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tugash sanasi (muddati)</label>
+                <input
+                  type="date"
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                  value={formData.paymentDueDate}
+                  onChange={(e) => setFormData({ ...formData, paymentDueDate: e.target.value })}
+                />
+             </div>
           </div>
 
           <div>

@@ -149,22 +149,25 @@ const Students = () => {
       return;
     }
 
-    // Validate payment day against selected month
-    const maxDays = getDaysInMonth(selectedMonth);
-    if (formData.paymentDayOfMonth > maxDays) {
-        setFormError(`${MONTHS.find(m => m.value === Number(selectedMonth))?.label} oyida bunday sana yo'q (maksimum ${maxDays})`);
-        toast.error(`${MONTHS.find(m => m.value === Number(selectedMonth))?.label} oyida bunday sana yo'q (maksimum ${maxDays})`);
+    if (formData.paymentDayOfMonth && (formData.paymentDayOfMonth < 1 || formData.paymentDayOfMonth > 31)) {
+        setFormError("To'lov sanasi 1 va 31 oralig'ida bo'lishi kerak");
+        toast.error("To'lov sanasi 1 va 31 oralig'ida bo'lishi kerak");
         return;
     }
     
     setFormError('');
     
     try {
+      const payload = {
+        ...formData,
+        paymentDayOfMonth: formData.paymentDayOfMonth ? Number(formData.paymentDayOfMonth) : null
+      };
+
       if (editingStudent) {
-        await updateMutation.mutateAsync({ id: editingStudent.id, data: formData });
+        await updateMutation.mutateAsync({ id: editingStudent.id, data: payload });
         toast.success("O'quvchi muvaffaqiyatli yangilandi");
       } else {
-        await createMutation.mutateAsync(formData);
+        await createMutation.mutateAsync(payload);
         toast.success("O'quvchi muvaffaqiyatli qo'shildi");
       }
       setIsModalOpen(false);
@@ -388,41 +391,21 @@ const Students = () => {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">To'lov oyi</label>
-                <select
-                  value={selectedMonth}
-                  onChange={(e) => {
-                      const newMonth = Number(e.target.value);
-                      setSelectedMonth(newMonth);
-                      // Adjust day if it exceeds new month's max days
-                      const maxDays = getDaysInMonth(newMonth);
-                      if (formData.paymentDayOfMonth > maxDays) {
-                          setFormData(prev => ({ ...prev, paymentDayOfMonth: maxDays }));
-                      }
-                  }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                >
-                  {MONTHS.map(month => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                    </option>
-                  ))}
-                </select>
-             </div>
-             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">To'lov sanasi</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">To'lov sanasi (Har oyning nechinchi kuni?)</label>
                 <input
                   type="number"
                   min="1"
-                  max={getDaysInMonth(selectedMonth)}
+                  max="31"
+                  required
                   placeholder="Masalan: 5"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                   value={formData.paymentDayOfMonth}
                   onChange={(e) => setFormData({ ...formData, paymentDayOfMonth: e.target.value })}
                 />
-            </div>
+                <p className="text-xs text-gray-400 mt-1">O'quvchining "Keyingi to'lov" muddati (End date) aynan shu raqamdan avtomatik hisoblanadi (masalan, 5-sana)</p>
+             </div>
           </div>
 
           <div>

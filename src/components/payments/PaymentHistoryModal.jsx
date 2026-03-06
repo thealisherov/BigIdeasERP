@@ -97,7 +97,9 @@ const PaymentHistoryModal = ({ isOpen, onClose, studentId, studentName }) => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b">
-                  <th className="px-4 py-2 text-xs font-semibold text-gray-500">Sana</th>
+                  <th className="px-4 py-2 text-xs font-semibold text-gray-500">To'lov oyi</th>
+                  <th className="px-4 py-2 text-xs font-semibold text-gray-500">Muddati</th>
+                  <th className="px-4 py-2 text-xs font-semibold text-gray-500">Sana (Chek)</th>
                   <th className="px-4 py-2 text-xs font-semibold text-gray-500">Summa</th>
                   <th className="px-4 py-2 text-xs font-semibold text-gray-500">Turi</th>
                   <th className="px-4 py-2 text-xs font-semibold text-gray-500">Izoh</th>
@@ -107,7 +109,13 @@ const PaymentHistoryModal = ({ isOpen, onClose, studentId, studentName }) => {
               <tbody className="divide-y divide-gray-200">
                 {payments.map((payment) => (
                   <tr key={payment.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-900">
+                    <td className="px-4 py-3 text-sm font-medium text-blue-600">
+                      {payment.paymentDate ? (payment.paymentDate.length > 7 ? payment.paymentDate.substring(0, 7) : payment.paymentDate) : '-'}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-red-500">
+                      {payment.paymentDueDate ? new Date(payment.paymentDueDate).toLocaleDateString() : '-'}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-500">
                       {new Date(payment.createdAt || payment.date).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-sm font-medium text-gray-900">
