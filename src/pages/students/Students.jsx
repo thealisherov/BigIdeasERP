@@ -37,7 +37,6 @@ const Students = () => {
     lastName: '',
     phoneNumber: '',
     parentPhoneNumber: '',
-    groupIds: [],
     paymentDayOfMonth: ''
   });
 
@@ -45,14 +44,6 @@ const Students = () => {
     queryKey: ['students'],
     queryFn: async () => {
       const response = await studentsApi.getAll();
-      return response.data;
-    },
-  });
-
-  const { data: groups = [] } = useQuery({
-    queryKey: ['groups'],
-    queryFn: async () => {
-      const response = await groupsApi.getAll();
       return response.data;
     },
   });
@@ -82,7 +73,6 @@ const Students = () => {
         lastName: student.lastName,
         phoneNumber: student.phoneNumber || '',
         parentPhoneNumber: student.parentPhoneNumber || '',
-        groupIds: student.groups ? student.groups.map(g => g.id) : [],
         paymentDayOfMonth: student.paymentDayOfMonth || ''
       });
     } else {
@@ -92,23 +82,11 @@ const Students = () => {
         lastName: '',
         phoneNumber: '',
         parentPhoneNumber: '',
-        groupIds: [],
         paymentDayOfMonth: ''
       });
     }
     setIsModalOpen(true);
   };
-
-  const toggleGroupSelection = useCallback((groupId) => {
-    setFormData(prev => {
-      const isSelected = prev.groupIds.includes(groupId);
-      if (isSelected) {
-        return { ...prev, groupIds: prev.groupIds.filter(id => id !== groupId) };
-      } else {
-        return { ...prev, groupIds: [...prev.groupIds, groupId] };
-      }
-    });
-  }, []);
 
   // Telefon raqam formatlash - +998 kiritish
   const formatPhoneNumber = (value) => {
@@ -405,35 +383,7 @@ const Students = () => {
                   onChange={(e) => setFormData({ ...formData, paymentDayOfMonth: e.target.value })}
                 />
                 <p className="text-xs text-gray-400 mt-1">O'quvchining "Keyingi to'lov" muddati (End date) aynan shu raqamdan avtomatik hisoblanadi (masalan, 5-sana)</p>
-             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Guruhlar</label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-48 overflow-y-auto p-2 border border-gray-200 rounded-lg">
-              {groups.map(group => (
-                <div
-                  key={group.id}
-                  className={`flex items-center p-2 rounded-lg cursor-pointer border transition-all ${
-                    formData.groupIds.includes(group.id)
-                      ? 'bg-blue-50 border-blue-500'
-                      : 'bg-white border-gray-200 hover:border-blue-300'
-                  }`}
-                  onClick={() => toggleGroupSelection(group.id)}
-                >
-                  <div className={`w-5 h-5 rounded border flex items-center justify-center mr-2 ${
-                    formData.groupIds.includes(group.id) ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
-                  }`}>
-                    {formData.groupIds.includes(group.id) && <FiCheck className="text-white w-3 h-3" />}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{group.name}</p>
-                    <p className="text-xs text-gray-500">{group.teacherName || 'O\'qituvchi yo\'q'}</p>
-                  </div>
-                </div>
-              ))}
-              {groups.length === 0 && <p className="text-sm text-gray-500 p-2">Guruhlar mavjud emas</p>}
-            </div>
+              </div>
           </div>
 
           <div className="flex justify-end gap-3 mt-6">

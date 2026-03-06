@@ -355,9 +355,37 @@ const Payments = () => {
                      <td className="px-6 py-4 text-sm text-gray-500">
                       {student.groupName || (student.groups?.map(g => g.name).join(', ') || '-')}
                     </td>
-                    <td className={`px-6 py-4 text-sm ${computedStatus === PAYMENT_STATUS.OVERDUE ? 'text-red-600 font-bold' : 'text-gray-500'}`}>
-                      {formatDate(student.nextDueDate || student.paymentDueDate || student.dueDate)}
-                    </td>
+                     <td className="px-6 py-4">
+                       {(() => {
+                         const dDate = student.nextDueDate || student.paymentDueDate || student.dueDate;
+                         if (!dDate) return <span className="text-gray-400">-</span>;
+                         try {
+                           const end = new Date(dDate);
+                           const start = new Date(dDate);
+                           start.setMonth(start.getMonth() - 1);
+                           
+                           return (
+                             <div className={`inline-flex flex-col gap-0.5 p-2 rounded-xl border transition-all duration-300 ${
+                               computedStatus === PAYMENT_STATUS.OVERDUE 
+                                 ? 'bg-red-50 border-red-100 text-red-700 shadow-sm' 
+                                 : 'bg-blue-50/50 border-blue-100/50 text-blue-700'
+                             }`}>
+                               <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider opacity-70">
+                                 <FiCalendar className="w-3 h-3" />
+                                 <span>To'lov davri</span>
+                               </div>
+                               <div className="flex items-center gap-2 text-[13px] font-medium whitespace-nowrap">
+                                 <span className="opacity-60">{formatDate(start)}</span>
+                                 <span className="w-1 h-3 bg-current opacity-20 rounded-full"></span>
+                                 <span className="font-bold">{formatDate(end)}</span>
+                               </div>
+                             </div>
+                           );
+                         } catch (e) {
+                           return <span className="text-gray-500 font-medium">{formatDate(dDate)}</span>;
+                         }
+                       })()}
+                     </td>
                     <td className="px-6 py-4 text-sm font-bold text-green-600">
                       {formatCurrency(student.totalPaidInMonth || 0)}
                     </td>
