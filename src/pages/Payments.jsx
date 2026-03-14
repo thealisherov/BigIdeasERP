@@ -352,8 +352,23 @@ const Payments = () => {
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {student.phoneNumber}
                     </td>
-                     <td className="px-6 py-4 text-sm text-gray-500">
-                      {student.groupName || (student.groups?.map(g => g.name).join(', ') || '-')}
+                     <td className="px-6 py-4 whitespace-nowrap">
+                      {student.groups && student.groups.length > 0 ? (
+                        <div className="flex flex-col gap-1.5">
+                          {student.groups.map((g, idx) => (
+                            <Link key={idx} to={`/groups/${g.id || g.groupId}`} className="flex flex-col bg-blue-50/50 hover:bg-blue-50 border border-blue-100/50 p-2 rounded-lg transition-colors group">
+                               <span className="text-[13px] font-bold text-blue-700 group-hover:text-blue-800 transition-colors inline-block max-w-[150px] truncate" title={g.name}>{g.name}</span>
+                               <span className="text-[11px] text-gray-500 mt-0.5"><span className="font-medium text-gray-700">O'qituvchi:</span> <span className="inline-block max-w-[100px] truncate align-bottom" title={g.teacherName || "Noma'lum"}>{g.teacherName || "Noma'lum"}</span></span>
+                            </Link>
+                          ))}
+                        </div>
+                      ) : student.groupName ? (
+                          <div className="flex flex-col bg-blue-50/50 hover:bg-blue-50 border border-blue-100/50 p-2 rounded-lg transition-colors group">
+                             <span className="text-[13px] font-bold text-blue-700 transition-colors inline-block max-w-[150px] truncate" title={student.groupName}>{student.groupName}</span>
+                          </div>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Guruhsiz</span>
+                      )}
                     </td>
                      <td className="px-6 py-4">
                        {(() => {

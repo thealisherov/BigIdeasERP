@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   FiPhone,
@@ -203,9 +203,13 @@ const StudentDetails = () => {
               <div className="grid sm:grid-cols-2 gap-4">
                 {groups.map((g) => (
                   <div key={g.id} className="border rounded p-4">
-                    <h4 className="font-semibold">{g.name}</h4>
-                    <p className="text-sm text-gray-500">
-                      {g.teacherName}
+                    <h4 className="font-semibold">
+                      <Link to={`/groups/${g.id}`} className="text-blue-600 hover:text-blue-800 hover:underline transition-colors gap-1 inline-flex items-center">
+                        {g.name}
+                      </Link>
+                    </h4>
+                    <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                      <span className="font-medium text-gray-700">O'qituvchi:</span> {g.teacherName || "Noma'lum"}
                     </p>
                     {g.tuitionFee != null && (
                       <p className="text-sm text-blue-600 font-medium mt-1">
