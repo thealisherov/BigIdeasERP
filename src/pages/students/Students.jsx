@@ -177,6 +177,7 @@ const Students = () => {
     }
   };
 
+
   const filteredStudents = useMemo(() => {
     const lower = searchTerm.toLowerCase();
     return students.filter(student =>
@@ -184,6 +185,7 @@ const Students = () => {
       student.lastName?.toLowerCase().includes(lower)
     );
   }, [students, searchTerm]);
+
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -219,27 +221,11 @@ const Students = () => {
           <table className="w-full min-w-[600px]">
             <thead className="bg-gray-50 border-b-2 border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  #
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ism
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Telefon
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Guruh
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Keyingi to'lov
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Amallar
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ism</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefon</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guruh</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amallar</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -252,9 +238,7 @@ const Students = () => {
               ) : filteredStudents.length > 0 ? (
                 filteredStudents.map((student, index) => (
                   <tr key={student.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {index + 1}
-                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 1}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
                         <Link to={`/students/${student.id}`} className="hover:text-blue-600 transition-colors">
@@ -279,32 +263,15 @@ const Students = () => {
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Guruhsiz</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(student.nextDueDate)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        Aktiv
-                      </span>
-                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
-                        <Link
-                          to={`/students/${student.id}`}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                        >
+                        <Link to={`/students/${student.id}`} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                           <FiEye className="h-4 w-4" />
                         </Link>
-                        <button
-                          onClick={() => handleOpenModal(student)}
-                          className="cursor-pointer p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                        >
+                        <button onClick={() => handleOpenModal(student)} className="cursor-pointer p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors">
                           <FiEdit2 className="h-4 w-4" />
                         </button>
-                        <button
-                          onClick={() => handleDelete(student.id)}
-                          className="cursor-pointer p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        >
+                        <button onClick={() => handleDelete(student.id)} className="cursor-pointer p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                           <FiTrash2 className="h-4 w-4" />
                         </button>
                       </div>

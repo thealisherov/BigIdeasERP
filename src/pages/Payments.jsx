@@ -309,24 +309,25 @@ const Payments = () => {
                  <option value="ALL">Barcha holatlar</option>
                  <option value={PAYMENT_STATUS.PAID}>To'liq to'lagan</option>
                  <option value={PAYMENT_STATUS.PARTIAL}>Qisman to'lagan</option>
-                 <option value={PAYMENT_STATUS.UNPAID}>To'lamagan</option>
+                 <option value={PAYMENT_STATUS.UNPAID}>Jarayonda</option>
+                 <option value={PAYMENT_STATUS.OVERDUE}>Muddati o'tgan</option>
              </select>
         </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left min-w-[800px]">
+          <table className="w-full text-left min-w-[950px]">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">O'quvchi</th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Telefon</th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Guruhlar</th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">To'lov muddati</th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">To'lagan</th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Qarzdorlik</th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Amallar</th>
+                <th className="px-3 py-3 text-xs font-semibold text-gray-500 uppercase">O'quvchi</th>
+                <th className="px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Telefon</th>
+                <th className="px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Guruhlar</th>
+                <th className="px-3 py-3 text-xs font-semibold text-gray-500 uppercase">To'lov muddati</th>
+                <th className="px-3 py-3 text-xs font-semibold text-gray-500 uppercase">To'lagan</th>
+                <th className="px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Qarzdorlik</th>
+                <th className="px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                <th className="px-3 py-3 text-xs font-semibold text-gray-500 uppercase">Amallar</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -343,16 +344,20 @@ const Payments = () => {
                 filteredData.map((student) => {
                   const computedStatus = getComputedStatus(student);
                   return (
-                  <tr key={student.id} className={`transition-colors ${(computedStatus === PAYMENT_STATUS.OVERDUE || computedStatus === PAYMENT_STATUS.UNPAID) ? 'bg-red-200 hover:bg-red-300' : 'hover:bg-gray-50'}`}>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                      <Link to={`/students/${student.id}`} className="hover:text-blue-600 transition-colors">
+                  <tr key={student.id} className={`transition-colors ${
+                    computedStatus === PAYMENT_STATUS.OVERDUE ? 'bg-red-100 hover:bg-red-200' :
+                    computedStatus === PAYMENT_STATUS.UNPAID  ? 'bg-amber-50 hover:bg-amber-100' :
+                    'hover:bg-gray-50'
+                  }`}>
+                    <td className="px-3 py-3 text-sm font-medium text-gray-900">
+                      <Link to={`/students/${student.id}`} className="hover:text-blue-600 transition-colors font-semibold">
                         {student.firstName} {student.lastName}
                       </Link>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-500">
+                    <td className="px-3 py-3 text-sm text-gray-500">
                       {student.phoneNumber}
                     </td>
-                     <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-3 py-3">
                       {student.groups && student.groups.length > 0 ? (
                         <div className="flex flex-col gap-1.5">
                           {student.groups.map((g, idx) => (
@@ -370,51 +375,43 @@ const Payments = () => {
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Guruhsiz</span>
                       )}
                     </td>
-                     <td className="px-6 py-4">
-                       {(() => {
+                    <td className="px-3 py-3">
+                    {(() => {
                          const dDate = student.nextDueDate || student.paymentDueDate || student.dueDate;
                          if (!dDate) return <span className="text-gray-400">-</span>;
                          try {
                            const end = new Date(dDate);
                            const start = new Date(dDate);
                            start.setMonth(start.getMonth() - 1);
-                           
                            return (
-                             <div className={`inline-flex flex-col gap-0.5 p-2 rounded-xl border transition-all duration-300 ${
-                               computedStatus === PAYMENT_STATUS.OVERDUE 
-                                 ? 'bg-red-50 border-red-100 text-red-700 shadow-sm' 
-                                 : 'bg-blue-50/50 border-blue-100/50 text-blue-700'
+                             <div className={`inline-flex flex-col gap-0.5 p-1.5 rounded-lg border text-[11px] ${
+                               computedStatus === PAYMENT_STATUS.OVERDUE
+                                 ? 'bg-red-50 border-red-200 text-red-700'
+                                 : 'bg-blue-50 border-blue-100 text-blue-700'
                              }`}>
-                               <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider opacity-70">
-                                 <FiCalendar className="w-3 h-3" />
-                                 <span>To'lov davri</span>
-                               </div>
-                               <div className="flex items-center gap-2 text-[13px] font-medium whitespace-nowrap">
-                                 <span className="opacity-60">{formatDate(start)}</span>
-                                 <span className="w-1 h-3 bg-current opacity-20 rounded-full"></span>
-                                 <span className="font-bold">{formatDate(end)}</span>
-                               </div>
+                               <span className="opacity-60">{formatDate(start)}</span>
+                               <span className="font-bold">{formatDate(end)}</span>
                              </div>
                            );
                          } catch (e) {
-                           return <span className="text-gray-500 font-medium">{formatDate(dDate)}</span>;
+                           return <span className="text-gray-500 text-xs">{formatDate(dDate)}</span>;
                          }
                        })()}
-                     </td>
-                    <td className="px-6 py-4 text-sm font-bold text-green-600">
+                    </td>
+                    <td className="px-3 py-3 text-xs font-bold text-green-600">
                       {formatCurrency(student.totalPaidInMonth || 0)}
                     </td>
-                    <td className="px-6 py-4 text-sm font-bold text-red-600">
+                    <td className="px-3 py-3 text-xs font-bold text-red-600">
                       {formatCurrency(student.remainingAmount)}
                     </td>
-                    <td className="px-6 py-4 text-sm">
-                       {computedStatus === PAYMENT_STATUS.PAID && <span className="text-green-600 bg-green-100 px-2 py-1 rounded text-xs font-medium">To'liq</span>}
-                       {computedStatus === PAYMENT_STATUS.PARTIAL && <span className="text-yellow-600 bg-yellow-100 px-2 py-1 rounded text-xs font-medium">Qisman</span>}
-                       {computedStatus === PAYMENT_STATUS.UNPAID && <span className="text-red-600 bg-red-100 px-2 py-1 rounded text-xs font-medium">To'lamagan</span>}
-                       {computedStatus === PAYMENT_STATUS.UPCOMING && <span className="text-blue-600 bg-blue-100 px-2 py-1 rounded text-xs font-medium">Kutilmoqda</span>}
-                       {computedStatus === PAYMENT_STATUS.OVERDUE && <span className="text-red-800 bg-red-200 px-2 py-1 rounded text-xs font-medium">Muddati o'tgan</span>}
+                    <td className="px-3 py-3 text-xs">
+                       {computedStatus === PAYMENT_STATUS.PAID && <span className="text-green-700 bg-green-100 px-1.5 py-0.5 rounded text-xs font-semibold">To'liq</span>}
+                       {computedStatus === PAYMENT_STATUS.PARTIAL && <span className="text-yellow-700 bg-yellow-100 px-1.5 py-0.5 rounded text-xs font-semibold">Qisman</span>}
+                       {computedStatus === PAYMENT_STATUS.UNPAID && <span className="text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded text-xs font-semibold">Jarayonda</span>}
+                       {computedStatus === PAYMENT_STATUS.UPCOMING && <span className="text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded text-xs font-semibold">Kutilmoqda</span>}
+                       {computedStatus === PAYMENT_STATUS.OVERDUE && <span className="text-red-700 bg-red-200 px-1.5 py-0.5 rounded text-xs font-semibold">Qardorlik</span>}
                     </td>
-                     <td className="px-6 py-4 text-sm">
+                     <td className="px-3 py-3 text-sm">
                        <div className="flex gap-2">
                          {/* UNPAID, UPCOMING, OVERDUE holatlarida to'lov tugmasi */}
                          {[PAYMENT_STATUS.UNPAID, PAYMENT_STATUS.UPCOMING, PAYMENT_STATUS.OVERDUE].includes(student.paymentStatus) || (!student.paymentStatus && student.remainingAmount > 0) ? (
